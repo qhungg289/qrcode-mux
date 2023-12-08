@@ -77,7 +77,10 @@ func main() {
 	r.Handle("/qrcode", handlers.LoggingHandler(os.Stdout, http.HandlerFunc(createQRCodeHandler))).Methods(http.MethodGet, http.MethodOptions)
 	r.Use(mux.CORSMethodMiddleware(r))
 
-	port := 8000
-	log.Printf("Listening on port :%d", port)
-	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", port), handlers.CompressHandler(r)))
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+	log.Printf("Listening on port :%s", port)
+	log.Fatal(http.ListenAndServe(":"+port, handlers.CompressHandler(r)))
 }
