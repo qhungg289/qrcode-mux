@@ -79,5 +79,5 @@ func main() {
 
 	port := 8000
 	log.Printf("Listening on port :%d", port)
-	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", port), r))
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", port), handlers.CompressHandler(r)))
 }
