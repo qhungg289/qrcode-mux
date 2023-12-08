@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -13,19 +12,16 @@ import (
 	qrcode "github.com/skip2/go-qrcode"
 )
 
-type Response struct {
+type response struct {
 	Message string `json:"message"`
 }
 
 func helloWorldHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 
-	res := Response{Message: "Hello, World"}
-	b, _ := json.Marshal(res)
-
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	fmt.Fprint(w, string(b))
+	json.NewEncoder(w).Encode(response{Message: "Hello, World"})
 }
 
 func createQRCodeHandler(w http.ResponseWriter, r *http.Request) {
@@ -33,11 +29,9 @@ func createQRCodeHandler(w http.ResponseWriter, r *http.Request) {
 
 	data := r.URL.Query().Get("data")
 	if data == "" {
-		res := Response{Message: "Data is required to create the QR code."}
-		b, _ := json.Marshal(res)
 		w.Header().Add("Content-Type", "application/json")
 		w.WriteHeader(http.StatusBadRequest)
-		fmt.Fprint(w, string(b))
+		json.NewEncoder(w).Encode(response{Message: "Data is required to create the QR code."})
 		return
 	}
 
@@ -47,22 +41,18 @@ func createQRCodeHandler(w http.ResponseWriter, r *http.Request) {
 		var err error
 		qrcodeSize, err = strconv.Atoi(size)
 		if err != nil {
-			res := Response{Message: "Size in invalid."}
-			b, _ := json.Marshal(res)
 			w.Header().Add("Content-Type", "application/json")
 			w.WriteHeader(http.StatusBadRequest)
-			fmt.Fprint(w, string(b))
+			json.NewEncoder(w).Encode(response{Message: "Size in invalid."})
 			return
 		}
 	}
 
 	png, err := qrcode.Encode(data, qrcode.Medium, qrcodeSize)
 	if err != nil {
-		res := Response{Message: "Failed to create the QR code from the given data."}
-		b, _ := json.Marshal(res)
 		w.Header().Add("Content-Type", "application/json")
 		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprint(w, string(b))
+		json.NewEncoder(w).Encode(response{Message: "Failed to create the QR code from the given data."})
 		return
 	}
 
