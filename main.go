@@ -40,6 +40,10 @@ func createQRCodeHandler(w http.ResponseWriter, r *http.Request) {
 	if size != "" {
 		var err error
 		qrcodeSize, err = strconv.Atoi(size)
+		const maxSize = 2048
+		if qrcodeSize > maxSize {
+			qrcodeSize = maxSize
+		}
 		if err != nil {
 			w.Header().Add("Content-Type", "application/json")
 			w.WriteHeader(http.StatusBadRequest)
